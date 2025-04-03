@@ -1,0 +1,11 @@
+---
+- name: Installer Apache
+  apt:
+    name: apache2
+    state: latest
+
+- name: Configurer Apache
+  template:
+    src: ../templates/apache.conf.j2
+    dest: /etc/apache2/apache2.conf
+  notify: restart apache

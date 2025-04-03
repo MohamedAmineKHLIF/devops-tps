@@ -1,0 +1,18 @@
+---
+- name: motd
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Installation de update-motd
+      apt:
+        name: update-motd
+        state: present
+
+    - name: Déploiement du template motd
+      template:
+        src: ../templates/motd.j2
+        dest: /etc/motd
+        owner: root
+        group: root
+        mode: "0644"

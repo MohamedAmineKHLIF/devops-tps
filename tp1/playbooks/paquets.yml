@@ -1,0 +1,12 @@
+---
+- name: Installation de paquets via variables
+  hosts: webservers
+  become: true
+  vars_files:
+    - "../group_vars/webservers.yml"
+
+  tasks:
+    - name: Installation des paquets listés
+      apt:
+        name: "{{ paquets }}"
+        state: present

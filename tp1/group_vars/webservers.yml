@@ -1,0 +1,6 @@
+---
+# Variables pour l'installation de paquets
+paquets:
+  - curl
+  - htop
+  - git

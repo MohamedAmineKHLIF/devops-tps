@@ -1,0 +1,14 @@
+---
+- name: Installation de curl
+  hosts: webservers  # les 2 VMs
+  become: true  # Active sudo
+
+  tasks:
+    - name: Mise à jour du cache apt
+      apt:
+        update_cache: yes
+
+    - name: Installation de curl
+      apt:
+        name: curl
+        state: present
