@@ -23,34 +23,6 @@ Il contient les 2 groupes :
 - [all:vars] : Variables communes à tous les hôtes
 Par la suite, j'ai crée le fichier **tp1/ansible.cfg** qui configure le comportement d'Ansible sur les hôtes.
 Pour vérifier qu'il pointe vers mon fichier d'inventaire, j'ai lancé la commande **ansible-inventory --list**. J'ai bien reçu la liste des machines que j'ai listé dans **hosts**.
-{
-    "_meta": {
-        "hostvars": {
-            "web1": {
-                "ansible_host": "10.75.17.56",
-                "ansible_ssh_private_key_file": "~/.ssh/ansible_key",
-                "ansible_user": "ansible1"
-            },
-            "web2": {
-                "ansible_host": "10.75.17.67",
-                "ansible_ssh_private_key_file": "~/.ssh/ansible_key",
-                "ansible_user": "ansible2"
-            }
-        }
-    },
-    "all": {
-        "children": [
-            "ungrouped",
-            "webservers"
-        ]
-    },
-    "webservers": {
-        "hosts": [
-            "web1",
-            "web2"
-        ]
-    }
-}
 ## Section 2 : Commandes de base d'Ansible 
 ### Exercice 1 : Ping des hôtes :
 J'ai essayé la commande **ansible all -m ping**. Ce qui se passe c'est :
@@ -60,76 +32,22 @@ web1 | SUCCESS => {"ping": "pong"}
 web2 | SUCCESS => {"ping": "pong"}
 ### Exercice 2 : Exécution de commandes simples :
 J'ai essayé la commande **ansible all -a "uname -a"**.
-Le résultat finale était : 
-web2 | CHANGED | rc=0 >>
-Linux ansible2 6.8.0-57-generic #59-Ubuntu SMP PREEMPT_DYNAMIC Sat Mar 15 17:40:59 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
-web1 | CHANGED | rc=0 >>
-Linux ansible1 6.8.0-57-generic #59-Ubuntu SMP PREEMPT_DYNAMIC Sat Mar 15 17:40:59 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
-Ceci montre qu'on a pu executer une commande simple et ramener les resultats de chaque machine.
+Le résultat obtenu montre qu'on a pu executer une commande simple et ramener les resultats de chaque machine.
 ## Section 3 : Playbooks de base
 ### Exercice 1 : Création d'un playbook simple :
-Mon playbook d'installation de curl contient :
-`- name: Installation de curl
-  hosts: webservers  # les 2 VMs
-  become: true  # Active sudo
-
-  tasks:
-    - name: Mise à jour du cache apt
-      apt:
-        update_cache: yes
-
-    - name: Installation de curl
-      apt:
-        name: curl
-        state: present`
+J'ai commencé par créer le playbook d'installation de curl.
 Ansible lit le playbook séquentiellement : il commence par collecter les infos systèmes (Facts), puis exécute chaque tâche en vérifiant d'abord l'état actuel avant d'agir.
 Pour ce playbook, il utilise le module apt pour : 1) mettre à jour le cache si nécessaire, 2) installer curl seulement s'il est absent.
 Les opérations sont idempotentes et parallélisées sur les hôtes, avec des résultats retournés en JSON.
-
 ### Exercice 2 : 
-J'ai lancé la commande **ansible-playbook playbooks/curl.yml**. Le résultat obtenu est :
-`PLAY [Installation de curl] ********************************************************************************************************************************
-
-TASK [Gathering Facts] *************************************************************************************************************************************
-ok: [web2]
-ok: [web1]
-
-TASK [Mise à jour du cache apt] ****************************************************************************************************************************
-changed: [web1]
-changed: [web2]
-
-TASK [Installation de curl] ********************************************************************************************************************************
-ok: [web1]
-ok: [web2]
-
-PLAY RECAP *************************************************************************************************************************************************
-web1                       : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-web2                       : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0`
-Ceci montre que web1 et web2 ont subi des changements en installant curl.
-Pour vérifier, j'ai lancé la commande ad-hoc (comment précédemment) : **ansible webservers -a "curl --version"**. Elle montre bel et bien que curl est installé sur les 2 machines avec la version 8.5.0
+J'ai lancé la commande **ansible-playbook playbooks/curl.yml**. Le résultat obtenu montre que web1 et web2 ont subi des changements en installant curl.
+Pour vérifier, j'ai lancé la commande ad-hoc (comment précédemment) : **ansible webservers -a "curl --version"**.
+Elle montre bel et bien que curl est installé sur les 2 machines avec la version 8.5.0
 
 ## Section 4 : Variables et Templates :  
 ### Exercice 1 : Utilisation de variables :
-J'ai commencé par créer un fichier **group_vars/webservers.yml**, ou j'ai mis la liste des paquets que je souhaite installer.
-`---
-paquets:
-  - curl
-  - htop
-  - git`
-Ensuite, j'ai créé un autre playbook **playbooks/paquets.yml** qui contient : 
-`---
-- name: Installation de paquets via variables
-  hosts: webservers
-  become: true
-  vars_files:
-    - "../group_vars/webservers.yml"
-
-  tasks:
-    - name: Installation des paquets listés
-      apt:
-        name: "{{ paquets }}"
-        state: present`
-Ensuite, j'ai executé le playbook avec la commande : **ansible-playbook playbooks/paquets.yml**.
+J'ai commencé par créer un fichier **group_vars/webservers.yml**, ou j'ai mis la liste des paquets que je souhaite installer : curl, htop et git.
+Ensuite, j'ai créé un autre playbook **playbooks/paquets.yml** et je l'ai executé avec la commande : **ansible-playbook playbooks/paquets.yml**.
 ### Exercice 2 : Utilisation de templates :
 J'ai commencé par créer le fichier **templates/motd.j2**. Il contient le template que je vais le mettre dans le fichier /etc/motd de chaque machine.
 Ensuite j'ai créé le playbook **playbooks/motd.yml**. 
