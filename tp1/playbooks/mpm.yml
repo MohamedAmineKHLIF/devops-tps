@@ -1,0 +1,24 @@
+---
+- name: Configuration des MPM Apache
+  hosts: webservers
+  become: yes
+  vars:
+    mpm_to_disable: ['event', 'worker']  # Modules à désactiver
+
+  # Import des handlers
+  handlers:
+    - import_tasks: ../roles/apache/handlers/main.yml
+
+  tasks:
+    - name: Désactiver les autres MPM
+      command: "a2dismod mpm_{{ item }}"
+      loop: "{{ mpm_to_disable }}"
+      ignore_errors: yes
+      notify: restart apache
+
+    - name: Activer mpm_prefork
+      command: "a2enmod mpm_prefork"
+      notify: restart apache
+
+    - name: Forcer l'exécution des handlers
+      meta: flush_handlers
