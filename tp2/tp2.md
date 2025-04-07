@@ -14,15 +14,25 @@ Pour vérifier qu'il pointe vers mon fichier d'inventaire, j'ai lancé la comman
 ## Section 2 : Création d'un Rôle pour Apache
 ### Exercice 1 : Structure du rôle
 J'ai créé un rôle nommé apache avec la structure suivante.
-roles/
-└── apache/
+
+    roles/
+
+    └── apache/
+
     ├── tasks/
+    
     │   └── main.yml
+    
     ├── handlers/
+    
     │   └── main.yml
+    
     ├── templates/
+    
     │   └── apache2.conf.j2
+    
     ├── vars/
+    
         └── main.yml
 ### Exercice 2 : Tâches pour installer Apache
 Dans **roles/apache/tasks/main.yml**, j'ai ajouté les tâches pour installer Apache, le configurer et une dernière tâche pour démarrer le service sur les 2 hôtes.
