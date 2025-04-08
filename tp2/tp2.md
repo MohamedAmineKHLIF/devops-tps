@@ -1,11 +1,12 @@
 # TP2 - Gestion de Serveurs Web avec Ansible
+## Github : https://github.com/MohamedAmineKHLIF/devops-tps
 ### **Objectif :** Utiliser Ansible pour déployer et configurer un serveur web Apache sur plusieurs hôtes.
 
 ## Section 1 : Préparation de l'Inventaire
 ### Exercice 1 : Création de l'inventaire
 Pour l'inventaire, j'ai crée le fichier **tp2/inventory/hosts**.
 Il contient les 2 groupes :
-- [webservers] : Les 2 serveurs cccc
+- [webservers] : Les 2 serveurs apache.
 - [all:vars] : Variables communes à tous les hôtes
 Par la suite, j'ai crée le fichier **tp2/ansible.cfg** qui configure le comportement d'Ansible sur les hôtes.
 ### Exercice 2 : Vérification de l'inventaire
