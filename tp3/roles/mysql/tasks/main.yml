@@ -1,0 +1,88 @@
+---
+- name: Installer mysql
+  apt:
+    name: mysql-server
+    state: latest
+    update_cache: yes
+
+- name: Configurer mysql
+  template:
+    src: ../templates/my.cnf.j2
+    dest: /etc/mysql/my.cnf
+  notify: restart mysql
+
+- name: Modifier le bind-address dans la configuration MySQL
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address\s*='
+    line: 'bind-address = 0.0.0.0'
+    backup: yes
+  notify: restart mysql
+
+
+- name: Démarrer mysql
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Installer les dépendances Python pour MySQL
+  apt:
+    name:
+      - python3-pymysql
+    state: present
+    update_cache: yes
+
+#- name: Modifier le plugin d'authentification du compte root
+#  community.mysql.mysql_user:
+#    name: root
+#    host: localhost
+#    password: root
+#    plugin: mysql_native_password
+#    login_unix_socket: /var/run/mysqld/mysqld.sock
+#    state: present
+#  notify: restart mysql
+  
+- name: Créer la base webdb
+  mysql_db:
+    name: webdb
+    state: present
+    login_user: root
+    login_password: root
+
+- name: Créer la table users
+  mysql_query:
+    login_user: root
+    login_password: root
+    login_db: webdb
+    query: |
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(50) NOT NULL
+      );
+
+- name: Insérer des utilisateurs
+  mysql_query:
+    login_user: root
+    login_password: root
+    login_db: webdb
+    query: |
+      INSERT INTO users (name) VALUES ('Amine'), ('Alex'), ('Mohamed') ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+- name: Assurer que les dépendances sont installées
+  apt:
+    name: python3-pymysql
+    state: present
+    update_cache: yes
+
+- name: Créer l'utilisateur root@10.75.17.56
+  community.mysql.mysql_user:
+    name: root
+    host: "10.75.17.56"
+    password: root
+    priv: "webdb.*:ALL,GRANT"
+    state: present
+    login_user: root
+    login_password: root
+    login_host: "localhost"
