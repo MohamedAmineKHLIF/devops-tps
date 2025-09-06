@@ -17,14 +17,6 @@
     state: started
     enabled: yes
 
-- name: Copier le fichier index.php
-  copy:
-    src: ~/devops-tps/tp3/roles/webapp/files/index.php
-    dest: /var/www/html/index.php
-    owner: www-data
-    group: www-data
-    mode: '0644'
-
 - name: Installer PHP
   apt:
     name:
