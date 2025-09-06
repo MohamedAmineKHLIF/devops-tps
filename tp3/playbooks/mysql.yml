@@ -1,8 +1,0 @@
----
-- name: Déploiement mysql
-  hosts: dbservers
-  become: true
-  vars_files:
-    - "../roles/mysql/vars/main.yml"
-  roles:
-    - ../roles/mysql
