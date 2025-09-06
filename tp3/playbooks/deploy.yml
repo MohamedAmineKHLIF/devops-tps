@@ -1,14 +1,14 @@
 ---
 
-- name: Déploiement Apache
-  hosts: webservers #, appservers
+- name: Déploiement du serveur Apache
+  hosts: webservers
   become: true
   vars_files:
     - "../roles/apache/vars/main.yml"
   roles:
     - ../roles/apache
 
-- name: Déploiement mysql
+- name: Déploiement de la base MySQL
   hosts: dbservers
   become: true
   vars_files:
@@ -16,7 +16,7 @@
   roles:
     - ../roles/mysql
 
-- name: Déployer l'application web sur les appservers
+- name: Déploiement de l'application
   hosts: appservers
   become: true
   roles:
