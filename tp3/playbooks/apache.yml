@@ -1,8 +1,0 @@
----
-- name: Déploiement Apache
-  hosts: webservers
-  become: true
-  vars_files:
-    - "../roles/apache/vars/main.yml"
-  roles:
-    - ../roles/apache
